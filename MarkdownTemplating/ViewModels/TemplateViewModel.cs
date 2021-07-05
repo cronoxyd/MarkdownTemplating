@@ -64,12 +64,14 @@ namespace MarkdownTemplating.ViewModels
         public ICommand UpdatePreviewCommand => new RelayCommand(
             () =>
             {
+                var cnt = Content;
+
                 // Setup the script engine
                 ScriptEngine.Script["sys"] = System;
                 ScriptEngine.Script["list"] = Systems.ToArray();
 
                 // Replace all expression placeholders with their evaluated result (or the text "error" if the script fails)
-                var filledContent = Regex.Replace(Content, @"(?s){{(?<expression>.*?)}}", m =>
+                cnt = Regex.Replace(cnt, @"(?s){{(?<expression>.*?)}}", m =>
                 {
                     var exp = m.Groups.Cast<Group>().FirstOrDefault(g => g.Name == "expression")?.Value;
 
@@ -86,23 +88,24 @@ namespace MarkdownTemplating.ViewModels
                     }
                 });
 
+                cnt = Regex.Replace(cnt, @"\\{\\{", "{{");
+                cnt = Regex.Replace(cnt, @"\\}\\}", "}}");
+
                 // Convert the content from markdown to HTML
                 var markdownPipeline = new MarkdownPipelineBuilder()
                     .UseAdvancedExtensions()
                     .Build();
 
-                string htmlContent;
-
                 try
                 {
-                    htmlContent = Markdown.ToHtml(filledContent, markdownPipeline);
+                    cnt = Markdown.ToHtml(cnt, markdownPipeline);
                 }
                 catch (Exception ex)
                 {
-                    htmlContent = ex.Message;
+                    cnt = ex.Message;
                 }
 
-                PreviewSource = htmlContent;
+                PreviewSource = cnt;
             },
             () => true
         );
