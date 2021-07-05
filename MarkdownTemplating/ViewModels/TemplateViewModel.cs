@@ -46,7 +46,6 @@ namespace MarkdownTemplating.ViewModels
             }
         }
 
-        private V8ScriptEngine ScriptEngine { get; } = new();
         private Task DeferPreviewTask { get; set; }
         private CancellationTokenSource DeferPreviewTaskCancellationTokenSource { get; set; }
         private CancellationToken DeferPreviewTaskCancellationToken { get; set; }
@@ -64,6 +63,8 @@ namespace MarkdownTemplating.ViewModels
         public ICommand UpdatePreviewCommand => new RelayCommand(
             () =>
             {
+                var ScriptEngine = new V8ScriptEngine();
+                ScriptEngine.AddHostType(typeof(Enumerable));
                 var cnt = Content;
 
                 // Setup the script engine
