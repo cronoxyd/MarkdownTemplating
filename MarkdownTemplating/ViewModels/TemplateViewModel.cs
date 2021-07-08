@@ -10,6 +10,7 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using MarkdownTemplating.Extensions;
 
 namespace MarkdownTemplating.ViewModels
 {
@@ -65,6 +66,7 @@ namespace MarkdownTemplating.ViewModels
             {
                 var ScriptEngine = new V8ScriptEngine();
                 ScriptEngine.AddHostType(typeof(Enumerable));
+                ScriptEngine.AddHostType(typeof(EnumerableExtensions));
                 var cnt = Content;
 
                 // Setup the script engine
